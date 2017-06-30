@@ -20,4 +20,61 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package com.pt.implementation;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+/**
+ *
+ * @author Tiago Alexandre Melo Almeida
+ */
+public class ServerTest {
+    
+    public ServerTest() {
+    }
+    
+    @Before
+    public void setUp() {
+    }
+    
+    @After
+    public void tearDown() {
+    }
+
+    @org.junit.Test
+    public void testStartListningConnections_int_IHandler() throws Exception {
+    }
+
+    @org.junit.Test
+    public void testStartListningConnections_int_ThreadConnectionServer() throws Exception {
+    }
+
+    @org.junit.Test
+    public void testStopListningConnections() {
+    }
+
+    @org.junit.Test
+    public void testStartListningRequests() throws Exception {
+    }
+
+    @org.junit.Test
+    public void testStopListningRequests() {
+    }
+
+    @org.junit.Test
+    public void testStopAllConnectionsListning() {
+    }
+
+    @org.junit.Test
+    public void testStopAllRequestListning() {
+    }
+
+    @org.junit.Test
+    public void testStopAll() {
+    }
+    
+}
