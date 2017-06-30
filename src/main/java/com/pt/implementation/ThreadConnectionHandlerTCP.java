@@ -20,4 +20,42 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package com.pt.implementation;
+
+import com.pt.interfaces.ThreadConnectionHandler;
+import com.pt.interfaces.IHandler;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import sun.misc.IOUtils;
+
+/**
+ *
+ * @author Tiago Alexandre Melo Almeida
+ */
+public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
+ 
+    
+    //represente a channel of communication with the client
+    private Socket cSocket;
+    
+    public ThreadConnectionHandlerTCP(IHandler mHandler,Socket cSocket)
+    {
+        super(mHandler);
+        this.cSocket = cSocket;
+    }
+
+    @Override
+    public void run() {
+        
+        try {
+            byte[] response = messageHandler.handleMessage(cSocket.getInputStream());
+            if (response.length>0)
+                cSocket.getOutputStream().write(response);
+        } catch (IOException ex) {
+            Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.SEVERE, "Error receiving or sending from socket", ex);
+        }
+    }
+}

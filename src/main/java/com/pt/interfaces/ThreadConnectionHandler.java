@@ -20,4 +20,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package com.pt.interfaces;
+
+import com.pt.interfaces.IHandler;
+
+/**
+ *
+ * @author Tiago Alexandre Melo Almeida
+ */
+public abstract class ThreadConnectionHandler implements Runnable {
+
+    
+    protected IHandler messageHandler;
+    
+    public ThreadConnectionHandler(IHandler mHandler){
+        this.messageHandler = mHandler;
+    }
+    
+}

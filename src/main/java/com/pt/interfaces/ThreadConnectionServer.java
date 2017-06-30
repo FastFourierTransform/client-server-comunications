@@ -20,4 +20,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package com.pt.interfaces;
+
+import com.pt.interfaces.IHandler;
+import java.util.concurrent.ExecutorService;
+
+/**
+ *
+ * @author Tiago Alexandre Melo Almeida
+ */
+public abstract class ThreadConnectionServer extends Thread{
+    
+    /**
+     * Implement others variabels and method to handle the clients sessions
+     */
+    protected IHandler messageHandler;
+    protected int port;
+    protected ExecutorService pool;
+    
+    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool){
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+}

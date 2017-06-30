@@ -20,4 +20,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package com.pt.interfaces;
+
+import java.io.InputStream;
+
+/**
+ *
+ * @author Tiago Alexandre Melo Almeida
+ */
+public interface IHandler {
+    
+    /**
+     * Handle the receive message, and send the response
+     * 
+     * @param message incoming message
+     * @return message to send
+     */
+    public byte[] handleMessage(InputStream message);
+}
