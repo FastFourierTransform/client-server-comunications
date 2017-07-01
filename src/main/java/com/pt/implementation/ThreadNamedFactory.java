@@ -23,59 +23,32 @@ SOFTWARE.
  */
 package com.pt.implementation;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ServerTest {
+public class ThreadNamedFactory implements ThreadFactory{
+
+    private final AtomicInteger couter;
+    private final String namePattern;
     
-    public ServerTest() {
+    /**
+     * Name pattern must have "%d" in the string
+     * Example: "NewThreadName - %d" 
+     * 
+     * @param namePattern 
+     */
+    public ThreadNamedFactory(String namePattern){
+        this.couter = new AtomicInteger(1);
+        this.namePattern = namePattern;
     }
     
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
-    @org.junit.Test
-    public void testStartListningConnections_int_IHandler() throws Exception {
-     
-    }
-
-    @org.junit.Test
-    public void testStartListningConnections_int_ThreadConnectionServer() throws Exception {
-    }
-
-    @org.junit.Test
-    public void testStopListningConnections() {
-    }
-
-    @org.junit.Test
-    public void testStartListningRequests() throws Exception {
-    }
-
-    @org.junit.Test
-    public void testStopListningRequests() {
-    }
-
-    @org.junit.Test
-    public void testStopAllConnectionsListning() {
-    }
-
-    @org.junit.Test
-    public void testStopAllRequestListning() {
-    }
-
-    @org.junit.Test
-    public void testStopAll() {
+    @Override
+    public Thread newThread(Runnable r) {
+        return new Thread(r, String.format(namePattern, couter.getAndIncrement()));
     }
     
 }

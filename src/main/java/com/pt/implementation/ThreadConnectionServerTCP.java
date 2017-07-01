@@ -43,7 +43,7 @@ public class ThreadConnectionServerTCP extends ThreadConnectionServer {
     private ServerSocket serverSocket;
     
     public ThreadConnectionServerTCP(int port,IHandler messageHandler,ExecutorService pool) {
-        super(port,messageHandler,pool);
+        super(port,messageHandler,pool,"ConnectionServerTCP on port "+port);
     }
 
     @Override

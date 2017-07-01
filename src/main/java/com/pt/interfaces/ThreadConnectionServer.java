@@ -40,8 +40,20 @@ public abstract class ThreadConnectionServer extends Thread{
     protected ExecutorService pool;
     
     public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool){
+        super("ConnectionServer on "+port);
         this.messageHandler = mHandler;
         this.port = port;
         this.pool = pool;
+    }
+    
+    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool,String name){
+        super(name);
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+    
+    public int getPort(){
+        return port;
     }
 }

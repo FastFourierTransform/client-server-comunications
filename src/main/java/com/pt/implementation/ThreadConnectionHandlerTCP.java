@@ -52,7 +52,7 @@ public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
         
         try {
             byte[] response = messageHandler.handleMessage(cSocket.getInputStream());
-            if (response.length>0)
+            if (response!=null && response.length>0)
                 cSocket.getOutputStream().write(response);
         } catch (IOException ex) {
             Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.SEVERE, "Error receiving or sending from socket", ex);

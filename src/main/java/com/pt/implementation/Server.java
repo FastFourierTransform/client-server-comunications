@@ -32,6 +32,7 @@ import com.pt.interfaces.IServer;
 import com.pt.interfaces.IHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  *
@@ -46,7 +47,7 @@ public class Server implements IServer{
     public Server(int nThreadsHandleMessage){
         connectionThreads = new HashMap<>();
         requestThreads = new HashMap<>();
-        threadPool = Executors.newFixedThreadPool(nThreadsHandleMessage);
+        threadPool = Executors.newFixedThreadPool(nThreadsHandleMessage,new ThreadNamedFactory("ThreadConnectionHandler - %d"));
     }
  
     @Override
@@ -69,12 +70,12 @@ public class Server implements IServer{
      * @param connectionServerImplementation
      * @throws ServerAlreadyUsePort 
      */
-    public void startListningConnections(int port, ThreadConnectionServer connectionServerImplementation) throws ServerAlreadyUsePort{
-        if (!connectionThreads.containsKey(port)){
-            connectionThreads.put(port, connectionServerImplementation);
-            connectionThreads.get(port).start();
+    public void startListningConnections(ThreadConnectionServer connectionServerImplementation) throws ServerAlreadyUsePort{
+        if (!connectionThreads.containsKey(connectionServerImplementation.getPort())){
+            connectionThreads.put(connectionServerImplementation.getPort(), connectionServerImplementation);
+            connectionThreads.get(connectionServerImplementation.getPort()).start();
         }else{
-            throw new ServerAlreadyUsePort(port);
+            throw new ServerAlreadyUsePort(connectionServerImplementation.getPort());
         }
     }
 
@@ -85,7 +86,7 @@ public class Server implements IServer{
      */
     @Override
     public void stopListningConnections(int port) {
-        if (connectionThreads.containsKey(port) && connectionThreads.get(port).isAlive())
+        if (connectionThreads.containsKey(port) && connectionThreads.get(port).isAlive() && !connectionThreads.get(port).isInterrupted())
             connectionThreads.get(port).interrupt();
     }
 
@@ -101,12 +102,12 @@ public class Server implements IServer{
 
     @Override
     public void stopAllConnectionsListning() {
-        connectionThreads.forEach((key,value) -> {value.interrupt();});
+        connectionThreads.forEach((k,v)->{if (!v.isInterrupted())v.interrupt();});
     }
 
     @Override
     public void stopAllRequestListning() {
-        requestThreads.forEach((key,value) -> {value.interrupt();});
+        requestThreads.forEach((k,v)->{if (!v.isInterrupted())v.interrupt();});
     }
 
     @Override

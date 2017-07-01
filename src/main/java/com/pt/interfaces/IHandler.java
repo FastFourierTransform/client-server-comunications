@@ -33,6 +33,7 @@ public interface IHandler {
     
     /**
      * Handle the receive message, and send the response
+     * If return = null or byte[] is empty, no message is send
      * 
      * @param message incoming message
      * @return message to send
