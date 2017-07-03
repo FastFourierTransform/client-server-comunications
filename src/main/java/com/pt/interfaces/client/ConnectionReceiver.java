@@ -39,6 +39,7 @@ public abstract class ConnectionReceiver extends Thread {
     private final Map<Integer, IResponseCallback> customHandlers;
 
     public ConnectionReceiver(IResponseCallback handler) {
+        super("ConnectionReceiver");
         this.defaultHandler = handler;
         customHandlers = new HashMap<>();
     }

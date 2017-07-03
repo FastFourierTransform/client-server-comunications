@@ -27,7 +27,6 @@ import com.pt.interfaces.client.ConnectionReceiver;
 import com.pt.interfaces.client.IResponseCallback;
 import com.pt.utils.Pointer;
 import com.pt.utils.Utils;
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;

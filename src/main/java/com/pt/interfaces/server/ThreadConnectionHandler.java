@@ -23,8 +23,6 @@ SOFTWARE.
  */
 package com.pt.interfaces.server;
 
-import com.pt.interfaces.server.IHandler;
-
 /**
  *
  * @author Tiago Alexandre Melo Almeida

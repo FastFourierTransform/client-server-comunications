@@ -23,7 +23,6 @@ SOFTWARE.
  */
 package com.pt.interfaces.server;
 
-import com.pt.interfaces.server.IHandler;
 import java.util.concurrent.ExecutorService;
 
 /**

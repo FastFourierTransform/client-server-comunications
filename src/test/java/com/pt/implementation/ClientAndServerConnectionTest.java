@@ -72,6 +72,7 @@ public class ClientAndServerConnectionTest {
         byte[] response = connection.sendRequest("Tiago".getBytes());//message "Tiago"
         //assert
         Assert.assertArrayEquals(expected, response);
+        
     }
    
 }

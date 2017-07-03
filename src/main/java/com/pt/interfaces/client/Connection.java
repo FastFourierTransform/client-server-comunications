@@ -23,12 +23,7 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.exceptions.ConflictMessageID;
-import com.pt.utils.Utils;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
