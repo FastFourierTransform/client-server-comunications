@@ -21,41 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation;
+package com.pt.interfaces.server;
 
-import com.pt.interfaces.ThreadConnectionHandler;
-import com.pt.interfaces.IHandler;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import sun.misc.IOUtils;
+import java.io.InputStream;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
- 
+public interface IHandler {
     
-    //represente a channel of communication with the client
-    private Socket cSocket;
-    
-    public ThreadConnectionHandlerTCP(IHandler mHandler,Socket cSocket)
-    {
-        super(mHandler);
-        this.cSocket = cSocket;
-    }
-
-    @Override
-    public void run() {
-        
-        try {
-            byte[] response = messageHandler.handleMessage(cSocket.getInputStream());
-            if (response!=null && response.length>0)
-                cSocket.getOutputStream().write(response);
-        } catch (IOException ex) {
-            Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.SEVERE, "Error receiving or sending from socket", ex);
-        }
-    }
+    /**
+     * Handle the receive message, and send the response
+     * If return = null or byte[] is empty, no message is send
+     * 
+     * @param message incoming message
+     * @return message to send
+     */
+    public byte[] handleMessage(byte[] message);
 }

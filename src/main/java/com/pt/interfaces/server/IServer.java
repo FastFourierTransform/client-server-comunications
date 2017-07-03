@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces;
+package com.pt.interfaces.server;
 
 import com.pt.exceptions.ServerAlreadyUsePort;
 import java.io.IOException;
@@ -78,5 +78,5 @@ public interface IServer {
     /**
      * Stop all Thread that are running
      */
-    void stopAll();
+    void shutdown();
 }

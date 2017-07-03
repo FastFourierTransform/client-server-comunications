@@ -23,6 +23,8 @@ SOFTWARE.
  */
 package com.pt.implementation;
 
+import com.pt.implementation.server.ThreadConnectionServerTCP;
+import com.pt.implementation.server.Server;
 import com.pt.exceptions.ServerAlreadyUsePort;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +53,7 @@ public class ServerMethodTest {
     
     @After
     public void tearDown() {
-        server.stopAll();
+        server.shutdown();
         Thread[] threadsRunning = new Thread[Thread.activeCount()];
         Thread.enumerate(threadsRunning);
         assertEquals(1, Arrays.asList(threadsRunning).stream()

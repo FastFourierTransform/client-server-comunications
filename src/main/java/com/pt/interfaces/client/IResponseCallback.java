@@ -21,12 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces;
+package com.pt.interfaces.client;
+
+import com.pt.utils.Pointer;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public abstract class ThreadRequestServer extends Thread{
-    
+public interface IResponseCallback {
+
+    void handlerResponse(byte[] message);
 }

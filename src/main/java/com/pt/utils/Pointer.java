@@ -21,21 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces;
-
-import com.pt.interfaces.IHandler;
+package com.pt.utils;
 
 /**
- *
+ * Class to simulate a pointer to primitive variables like in c or c++
+ * 
  * @author Tiago Alexandre Melo Almeida
+ * @param <T>
  */
-public abstract class ThreadConnectionHandler implements Runnable {
-
-    
-    protected IHandler messageHandler;
-    
-    public ThreadConnectionHandler(IHandler mHandler){
-        this.messageHandler = mHandler;
-    }
-    
+public class Pointer<T> {
+    public T value;
 }

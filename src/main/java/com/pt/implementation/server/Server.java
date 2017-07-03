@@ -21,15 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation;
+package com.pt.implementation.server;
 
-import com.pt.interfaces.ThreadRequestServer;
-import com.pt.interfaces.ThreadConnectionServer;
+import com.pt.interfaces.server.ThreadRequestServer;
+import com.pt.interfaces.server.ThreadConnectionServer;
 import com.pt.exceptions.ServerAlreadyUsePort;
 import java.util.HashMap;
 import java.util.Map;
-import com.pt.interfaces.IServer;
-import com.pt.interfaces.IHandler;
+import com.pt.interfaces.server.IServer;
+import com.pt.interfaces.server.IHandler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -111,7 +111,7 @@ public class Server implements IServer{
     }
 
     @Override
-    public void stopAll() {
+    public void shutdown() {
         stopAllConnectionsListning();
         stopAllRequestListning();
     }

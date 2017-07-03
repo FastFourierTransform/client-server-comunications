@@ -21,34 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation;
-
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
+package com.pt.exceptions;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
+ * 
+ * This exception should appear if user correct use the API
  */
-public class ThreadNamedFactory implements ThreadFactory{
-
-    private final AtomicInteger couter;
-    private final String namePattern;
-    
-    /**
-     * Name pattern must have "%d" in the string
-     * Example: "NewThreadName - %d" 
-     * 
-     * @param namePattern 
-     */
-    public ThreadNamedFactory(String namePattern){
-        this.couter = new AtomicInteger(1);
-        this.namePattern = namePattern;
+public class ConflictMessageID extends RuntimeException{
+    public ConflictMessageID(int messageID){
+        super("Conflict messageID alredy exist " + messageID);
     }
-    
-    @Override
-    public Thread newThread(Runnable r) {
-        return new Thread(r, String.format(namePattern, couter.getAndIncrement()));
-    }
-    
 }

@@ -21,50 +21,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation;
+package com.pt.implementation.infrastruct;
 
-import com.pt.interfaces.ThreadConnectionServer;
-import com.pt.interfaces.IHandler;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.ExecutorService;
+import com.pt.exceptions.ServerAlreadyUsePort;
+import com.pt.implementation.client.Client;
+import com.pt.implementation.server.Server;
+import com.pt.interfaces.server.IHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Simulate a new process 
+ * 
  * @author Tiago Alexandre Melo Almeida
  */
-public class ThreadConnectionServerTCP extends ThreadConnectionServer {
+public class ThreadServer extends Thread{
 
-    public static final String TCP_SERVER = "TCP__SERVER";
+    private final IHandler serverHandler;
+    private final Server server;
+    private final int port;
     
-    private ServerSocket serverSocket;
-    
-    public ThreadConnectionServerTCP(int port,IHandler messageHandler,ExecutorService pool) {
-        super(port,messageHandler,pool,"ConnectionServerTCP on port "+port);
+    public ThreadServer( int port,IHandler sHandler){
+        this.serverHandler = sHandler;
+        this.server = new Server(50);
+        this.port = port;
     }
-
+    
     @Override
     public void run() {
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException ex) {
-            Logger.getLogger(TCP_SERVER).log(Level.SEVERE, "Port already in use by other program, can´t launch this thread", ex);
-            return;
-        }
         
-        while (true)
-        {
-            try {
-                Socket tempConnection = serverSocket.accept();
-
-                pool.execute(new ThreadConnectionHandlerTCP(messageHandler,tempConnection));
-                
-            } catch (IOException ex) {
-                Logger.getLogger(ThreadConnectionServerTCP.class.getName()).log(Level.SEVERE, "Unable to accept connection error ", ex);
-            }
+        try {
+            server.startListningConnections(port, serverHandler);
+        } catch (ServerAlreadyUsePort ex) {
+            Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void shutdown(){
+        server.shutdown();
+        this.interrupt();
+    }
+    
 }

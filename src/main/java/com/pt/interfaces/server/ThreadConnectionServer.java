@@ -21,22 +21,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces;
+package com.pt.interfaces.server;
 
-import java.io.InputStream;
+import com.pt.interfaces.server.IHandler;
+import java.util.concurrent.ExecutorService;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IHandler {
+public abstract class ThreadConnectionServer extends Thread{
     
     /**
-     * Handle the receive message, and send the response
-     * If return = null or byte[] is empty, no message is send
-     * 
-     * @param message incoming message
-     * @return message to send
+     * Implement others variabels and method to handle the clients sessions
      */
-    public byte[] handleMessage(InputStream message);
+    protected IHandler messageHandler;
+    protected int port;
+    protected ExecutorService pool;
+    
+    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool){
+        super("ConnectionServer on "+port);
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+    
+    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool,String name){
+        super(name);
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+    
+    public int getPort(){
+        return port;
+    }
 }

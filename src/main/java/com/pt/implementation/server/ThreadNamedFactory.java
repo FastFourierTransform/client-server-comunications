@@ -21,39 +21,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces;
+package com.pt.implementation.server;
 
-import com.pt.interfaces.IHandler;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public abstract class ThreadConnectionServer extends Thread{
+public class ThreadNamedFactory implements ThreadFactory{
+
+    private final AtomicInteger couter;
+    private final String namePattern;
     
     /**
-     * Implement others variabels and method to handle the clients sessions
+     * Name pattern must have "%d" in the string
+     * Example: "NewThreadName - %d" 
+     * 
+     * @param namePattern 
      */
-    protected IHandler messageHandler;
-    protected int port;
-    protected ExecutorService pool;
-    
-    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool){
-        super("ConnectionServer on "+port);
-        this.messageHandler = mHandler;
-        this.port = port;
-        this.pool = pool;
+    public ThreadNamedFactory(String namePattern){
+        this.couter = new AtomicInteger(1);
+        this.namePattern = namePattern;
     }
     
-    public ThreadConnectionServer(int port,IHandler mHandler,ExecutorService pool,String name){
-        super(name);
-        this.messageHandler = mHandler;
-        this.port = port;
-        this.pool = pool;
+    @Override
+    public Thread newThread(Runnable r) {
+        return new Thread(r, String.format(namePattern, couter.getAndIncrement()));
     }
     
-    public int getPort(){
-        return port;
-    }
 }
