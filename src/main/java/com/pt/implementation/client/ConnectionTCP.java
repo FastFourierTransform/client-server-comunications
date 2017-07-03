@@ -63,14 +63,21 @@ public class ConnectionTCP extends Connection {
     public byte[] sendRequest(byte[] message) throws IOException, InterruptedException{
 
         int messageID = messageIDgenerator.getAndIncrement();
-        byte[] idAndSize = Utils.concatenateByteArrays(Utils.intToBytes(messageID),Utils.intToBytes(message.length));
-        sClient.getOutputStream().write(Utils.concatenateByteArrays(idAndSize, message));
 
-        //wait sync response
+        //prepare thread receiver to handle the response
         Semaphore wait = new Semaphore(0);//initialy 0 permits
         HandlerSyncResponse response = new HandlerSyncResponse(wait);
         receiverThread.addCustomHanlder(messageID, response);
+
+        //send request
+        byte[] idAndSize = Utils.concatenateByteArrays(Utils.intToBytes(messageID),Utils.intToBytes(message.length));
+        sClient.getOutputStream().write(Utils.concatenateByteArrays(idAndSize, message));
+        sClient.getOutputStream().flush();
+        
+        System.out.println("Client block");
+        //wait sync response
         wait.acquire();//block until receive the answer
+        System.out.println("Client unblock");
         return response.getReceiveMessage();
 
     }
