@@ -59,9 +59,9 @@ public class ConnectionReceiverTCP extends ConnectionReceiver {
         try {
             DataInputStream input = new DataInputStream(inSocket.getInputStream());
             int messageId = input.readInt();
-            System.out.println("client - messageId " + messageId);
+            //System.out.println("client - messageId " + messageId);
             int messageSize = input.readInt();
-            System.out.println("client - messageSize " + messageSize);
+            //System.out.println("client - messageSize " + messageSize);
             pointer.value = Utils.readUntilMaxSize(input,messageSize);
             
             return messageId;

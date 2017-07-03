@@ -63,11 +63,11 @@ public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
                 //Thread.sleep(5000);//for test
                 
                 if (response!=null && response.length>0){
-                    System.out.println("Server - create response");
+                    //System.out.println("Server - create response");
                     byte[] idAndSize = Utils.concatenateByteArrays(Utils.intToBytes(messageId),Utils.intToBytes(response.length));
                     cSocket.getOutputStream().write(Utils.concatenateByteArrays(idAndSize, response));
                     cSocket.getOutputStream().flush();
-                    System.out.println("Server - Send response");
+                    //System.out.println("Server - Send response");
                 }
             }
         } catch (IOException ex) {

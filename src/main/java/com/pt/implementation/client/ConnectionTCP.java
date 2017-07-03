@@ -74,10 +74,8 @@ public class ConnectionTCP extends Connection {
         sClient.getOutputStream().write(Utils.concatenateByteArrays(idAndSize, message));
         sClient.getOutputStream().flush();
         
-        System.out.println("Client block");
         //wait sync response
         wait.acquire();//block until receive the answer
-        System.out.println("Client unblock");
         return response.getReceiveMessage();
 
     }

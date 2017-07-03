@@ -54,7 +54,7 @@ public abstract class ConnectionReceiver extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Client receiver strat");
+        //System.out.println("Client receiver strat");
         while (condition()) {
             Pointer<byte[]> pointerResponse = new Pointer<>(); 
 
