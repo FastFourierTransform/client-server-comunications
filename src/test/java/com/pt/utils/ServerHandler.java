@@ -21,39 +21,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.interfaces.client;
+package com.pt.utils;
 
-import com.pt.exceptions.ClientAlreadyUsePort;
+import com.pt.interfaces.server.IHandler;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.Semaphore;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IClient extends IRequest{
+public class ServerHandler implements IHandler {
     
-    /**
-     * Start new thread that will receive messages send by the server,
-     * All message will be handle with the defaultHandler if not override
-     * 
-     * @param host
-     * @param port
-     * @param defaultHandler
-     * @return 
-     * @throws com.pt.exceptions.ClientAlreadyUsePort 
-     */
-    IConnection startConnection(String host,int port,IResponseCallback defaultHandler) throws ClientAlreadyUsePort;
+    public String receiveMessage;
     
-    /**
-     * End the connection
-     * 
-     * @param port 
-     */
-    void closeConnection(int port);
+    private Semaphore sem;
     
-    /**
-     * close all connections
-     * 
-     */
-    void shutdown();
+    public ServerHandler(Semaphore sem){
+        this.sem = sem;
+    }
+    
+    @Override
+    public void handleMessage(InputStream inMessage, OutputStream outMessage) throws Exception {
+       
+        byte[] buffer = new byte[30];//Will work for test purpose, but user should implement his protocol
+
+        int read= inMessage.read(buffer);
+
+        byte[] r = new byte[read];
+        System.arraycopy(buffer, 0, r, 0, read);
+
+        receiveMessage = new String(r);
+        System.out.println("Server receive " + receiveMessage + " size " + read);
+        String send = "Ola " + receiveMessage;
+        outMessage.write(send.getBytes());
+
+        sem.release();
+    }
+    
 }

@@ -25,6 +25,7 @@ package com.pt.interfaces.client;
 
 import com.pt.exceptions.ConflictMessageID;
 import com.pt.utils.Pointer;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,20 +56,27 @@ public abstract class ConnectionReceiver extends Thread {
     @Override
     public void run() {
         //System.out.println("Client receiver strat");
-        while (condition()) {
-            Pointer<byte[]> pointerResponse = new Pointer<>(); 
+        
 
-            int messageID = waitResponse(pointerResponse);
+        while (condition()) {
             
+            Pointer<InputStream> pointerResponse = new Pointer<>(); 
+            int messageID = waitResponse(pointerResponse);
+            System.out.println("INPUT STREAM: " + pointerResponse.value + " id " + messageID);
             if (messageID==-1 && pointerResponse.value==null){
                 //log the error TODO
                 continue;
             }
-            
+            try{
             if (customHandlers.containsKey(messageID)) {
-                customHandlers.get(messageID).handlerResponse(pointerResponse.value);
+                //remove and use the handler
+                System.out.println("custom handler");
+                customHandlers.remove(messageID).handlerResponse(pointerResponse.value);
             } else {
                 defaultHandler.handlerResponse(pointerResponse.value);
+            }
+            }catch(Exception e){
+                e.printStackTrace();//CHANGE TODO
             }
         }
 
@@ -78,12 +86,10 @@ public abstract class ConnectionReceiver extends Thread {
 
     /**
      * 
-     * @param response class Pointer is needed because i want to pass byte[] by reference
-     * with the objective of the byte array can be define inside of the method and the changes
-     * replicated outside
-     * 
-     * @return messageID
+     * @param responseServer "Pointer.value" shlould be equal to the InputStream corresponding to
+     * the server response.
+     * @return 
      */
-    public abstract int waitResponse(Pointer<byte[]> response);
+    public abstract int waitResponse(Pointer<InputStream> responseServer);
 
 }

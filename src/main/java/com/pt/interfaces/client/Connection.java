@@ -23,6 +23,7 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,12 +36,23 @@ public abstract class Connection implements IConnection {
     protected final String hostName;
     protected final ConnectionReceiver receiverThread;
     protected final AtomicInteger messageIDgenerator;
+    //thread pool for send big messages in parallele assync optional
+    protected final ExecutorService requestThreadPool;
 
+    public Connection(String hostName, int port, ConnectionReceiver receiver,ExecutorService pool) {
+        this.hostName = hostName;
+        this.port = port;
+        this.receiverThread = receiver;
+        this.messageIDgenerator = new AtomicInteger();
+        this.requestThreadPool = pool;
+    }
+    
     public Connection(String hostName, int port, ConnectionReceiver receiver) {
         this.hostName = hostName;
         this.port = port;
         this.receiverThread = receiver;
         this.messageIDgenerator = new AtomicInteger();
+        this.requestThreadPool = null; // implementation will not use thread pool
     }
 
     public int getPort() {

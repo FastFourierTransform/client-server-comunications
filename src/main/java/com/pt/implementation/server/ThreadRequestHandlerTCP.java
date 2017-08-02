@@ -21,15 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation.client;
+package com.pt.implementation.server;
 
-import com.pt.interfaces.client.ConnectionReceiver;
-import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
+import com.pt.interfaces.server.IHandler;
+import com.pt.interfaces.server.ThreadRequestHandler;
 import com.pt.utils.Utils;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,35 +37,32 @@ import java.util.logging.Logger;
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
-    
-    private Socket inSocket;
-    
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
+public class ThreadRequestHandlerTCP extends ThreadRequestHandler {
 
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
-    }
-    
-    @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
+    //represente a channel of communication with the client
+    private final Socket cSocket;
+
+    public ThreadRequestHandlerTCP(IHandler mHandler, Socket cSocket) {
+        super(mHandler);
+        this.cSocket = cSocket;
     }
 
     @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void run() {
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
+            OutputStream out = cSocket.getOutputStream();
+            InputStream in = cSocket.getInputStream();
+            DataInputStream input = new DataInputStream(in);
             int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
-        } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
-        } 
-        return -1;
+            //keep message protocol
+            out.write(Utils.intToBytes(messageId));
+            messageHandler.handleMessage(in, out);
+            out.flush();
+
+            cSocket.close();
+        } catch (Exception ex) {
+            Logger.getLogger(ThreadRequestHandlerTCP.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
 }

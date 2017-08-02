@@ -42,21 +42,23 @@ public class Server implements IServer{
     
     private final Map<Integer,ThreadConnectionServer> connectionThreads;
     private final Map<Integer,ThreadRequestServer> requestThreads;
-    private final ExecutorService threadPool;
+    private final ExecutorService connectionThreadPool;
+    private final ExecutorService requestThreadPool;
     
-    public Server(int nThreadsHandleMessage){
+    public Server(int nThreadsHandleConnectionsMessage,int nThreadsHandleRequestMessage){
         connectionThreads = new HashMap<>();
         requestThreads = new HashMap<>();
-        threadPool = Executors.newFixedThreadPool(nThreadsHandleMessage,new ThreadNamedFactory("ThreadConnectionHandler - %d"));
+        //Maybe only initilizate threadpool if needed
+        connectionThreadPool = Executors.newFixedThreadPool(nThreadsHandleConnectionsMessage,new ThreadNamedFactory("ThreadConnectionHandler - %d"));
+        requestThreadPool = Executors.newFixedThreadPool(nThreadsHandleRequestMessage,new ThreadNamedFactory("ThreadRequestHandler - %d"));
     }
  
     @Override
     public void startListningConnections(int port, IHandler messageHandler) throws ServerAlreadyUsePort{
             
         if (!connectionThreads.containsKey(port)){
-            connectionThreads.put(port, new ThreadConnectionServerTCP(port,messageHandler,threadPool));
+            connectionThreads.put(port, new ThreadConnectionServerTCP(port,messageHandler,connectionThreadPool));
             connectionThreads.get(port).start();
-
         }else{
             throw new ServerAlreadyUsePort(port);
         }
@@ -73,6 +75,7 @@ public class Server implements IServer{
     public void startListningConnections(ThreadConnectionServer connectionServerImplementation) throws ServerAlreadyUsePort{
         if (!connectionThreads.containsKey(connectionServerImplementation.getPort())){
             connectionThreads.put(connectionServerImplementation.getPort(), connectionServerImplementation);
+            connectionServerImplementation.setPool(connectionThreadPool);
             connectionThreads.get(connectionServerImplementation.getPort()).start();
         }else{
             throw new ServerAlreadyUsePort(connectionServerImplementation.getPort());
@@ -92,12 +95,18 @@ public class Server implements IServer{
 
     @Override
     public void startListningRequests(int port, IHandler messageHandler) throws ServerAlreadyUsePort {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (!requestThreads.containsKey(port)){
+            requestThreads.put(port, new ThreadRequestServerTCP(port,messageHandler,requestThreadPool));
+            requestThreads.get(port).start();
+        }else{
+            throw new ServerAlreadyUsePort(port);
+        }
     }
 
     @Override
     public void stopListningRequests(int port) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (requestThreads.containsKey(port) && requestThreads.get(port).isAlive() && !requestThreads.get(port).isInterrupted())
+            requestThreads.get(port).interrupt();
     }
 
     @Override

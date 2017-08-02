@@ -24,7 +24,12 @@ SOFTWARE.
 package com.pt.implementation.client;
 
 import com.pt.interfaces.client.IResponseCallback;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -33,20 +38,27 @@ import java.util.concurrent.Semaphore;
 public class HandlerSyncResponse implements IResponseCallback{
 
     private Semaphore sem;
-    private byte[] receiveMessage;
+    private InputStream message;
     
     public HandlerSyncResponse(Semaphore sem){
         this.sem = sem;
     }
     
     @Override
-    public void handlerResponse(byte[] message) {
-        this.receiveMessage = message;
-        sem.release();
+    public void handlerResponse(InputStream inStream) {
+
+        try {
+            //message receive
+            System.out.println("avai " + inStream.available());
+            this.message = inStream;
+            sem.release();
+        } catch (IOException ex) {
+            Logger.getLogger(HandlerSyncResponse.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public byte[] getReceiveMessage() {
-        return receiveMessage;
+    public InputStream getInputStream() {
+        return message;
     }
     
     

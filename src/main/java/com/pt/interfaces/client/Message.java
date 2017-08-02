@@ -23,37 +23,12 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.exceptions.ClientAlreadyUsePort;
-import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IClient extends IRequest{
-    
-    /**
-     * Start new thread that will receive messages send by the server,
-     * All message will be handle with the defaultHandler if not override
-     * 
-     * @param host
-     * @param port
-     * @param defaultHandler
-     * @return 
-     * @throws com.pt.exceptions.ClientAlreadyUsePort 
-     */
-    IConnection startConnection(String host,int port,IResponseCallback defaultHandler) throws ClientAlreadyUsePort;
-    
-    /**
-     * End the connection
-     * 
-     * @param port 
-     */
-    void closeConnection(int port);
-    
-    /**
-     * close all connections
-     * 
-     */
-    void shutdown();
+public interface Message {
+    void send(OutputStream outStream) throws Exception;
 }

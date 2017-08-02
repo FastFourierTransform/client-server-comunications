@@ -48,7 +48,7 @@ public class ServerMethodTest {
     
     @Before
     public void setUp() {
-        server = new Server(100);
+        server = new Server(100,100);
     }
     
     @After
@@ -63,7 +63,8 @@ public class ServerMethodTest {
     public void testStartAndStopListningConnections() throws Exception {
         //arrange,act
         server.startListningConnections(4554
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                } );
         
         //assert
         Thread[] threadsRunning = new Thread[Thread.activeCount()];
@@ -107,10 +108,12 @@ public class ServerMethodTest {
     public void testStartInAlredyUsagePortConnection()throws Exception {
         //arrange
         server.startListningConnections(4001
-                , (in) -> {return null;} );
+                ,(inMessage, outMessage) -> {
+                } );
         //act
         server.startListningConnections(4001
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                });
     }
     
     @Test
@@ -118,7 +121,8 @@ public class ServerMethodTest {
         //arrange,act
         server.startListningConnections(new ThreadConnectionServerTCP(
                 8000,
-                (in) -> {return null;},
+                (inMessage, outMessage) -> {
+                },
                 //dumb thread pool only for test propose
                 Executors.newCachedThreadPool()));
         
@@ -144,13 +148,15 @@ public class ServerMethodTest {
         //arrange
         server.startListningConnections(new ThreadConnectionServerTCP(
                 8001,
-                (in) -> {return null;},
+                (inMessage, outMessage) -> {
+                },
                 //dumb thread pool only for test propose
                 Executors.newCachedThreadPool()));
         //act
         server.startListningConnections(new ThreadConnectionServerTCP(
                 8001,
-                (in) -> {return null;},
+                (inMessage, outMessage) -> {
+                },
                 //dumb thread pool only for test propose
                 Executors.newCachedThreadPool()) );
     }
@@ -161,13 +167,17 @@ public class ServerMethodTest {
         List<Integer> ports = Arrays.asList(4555, 4556, 4557, 4558);
         //act
         server.startListningConnections(ports.get(0)
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                });
         server.startListningConnections(ports.get(1)
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                } );
         server.startListningConnections(ports.get(2)
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                } );
         server.startListningConnections(ports.get(3)
-                , (in) -> {return null;} );
+                , (inMessage, outMessage) -> {
+                } );
         
         //assert
         Thread[] threadsRunning = new Thread[Thread.activeCount()];

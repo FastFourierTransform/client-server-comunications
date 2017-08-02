@@ -24,6 +24,7 @@ SOFTWARE.
 package com.pt.interfaces.server;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  *
@@ -33,10 +34,9 @@ public interface IHandler {
     
     /**
      * Handle the receive message, and send the response
-     * If return = null or byte[] is empty, no message is send
      * 
      * @param message incoming message
      * @return message to send
      */
-    public byte[] handleMessage(byte[] message);
+    public void handleMessage(InputStream inMessage, OutputStream outMessage) throws Exception;
 }

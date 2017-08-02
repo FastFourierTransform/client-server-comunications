@@ -21,45 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation.infrastruct;
+package com.pt.interfaces.server;
 
-import com.pt.exceptions.ServerAlreadyUsePort;
-import com.pt.implementation.client.Client;
-import com.pt.implementation.server.Server;
-import com.pt.interfaces.server.IHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.InputStream;
 
 /**
- * Simulate a new process 
- * 
+ *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ThreadServer extends Thread{
+public abstract class ThreadRequestHandler implements Runnable {
 
-    private final IHandler serverHandler;
-    private final Server server;
-    private final int port;
     
-    public ThreadServer( int port,IHandler sHandler){
-        this.serverHandler = sHandler;
-        this.server = new Server(50);
-        this.port = port;
-    }
+    protected IHandler messageHandler;
     
-    @Override
-    public void run() {
-        
-        try {
-            server.startListningConnections(port, serverHandler);
-        } catch (ServerAlreadyUsePort ex) {
-            Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void shutdown(){
-        server.shutdown();
-        this.interrupt();
+    public ThreadRequestHandler(IHandler mHandler){
+        this.messageHandler = mHandler;
     }
     
 }

@@ -23,37 +23,21 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.exceptions.ClientAlreadyUsePort;
-import java.io.InputStream;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IClient extends IRequest{
+public abstract class Request implements IRequest{
     
-    /**
-     * Start new thread that will receive messages send by the server,
-     * All message will be handle with the defaultHandler if not override
-     * 
-     * @param host
-     * @param port
-     * @param defaultHandler
-     * @return 
-     * @throws com.pt.exceptions.ClientAlreadyUsePort 
-     */
-    IConnection startConnection(String host,int port,IResponseCallback defaultHandler) throws ClientAlreadyUsePort;
+    protected ExecutorService poolThread;
+    protected final AtomicInteger messageIDgenerator = new AtomicInteger();
     
-    /**
-     * End the connection
-     * 
-     * @param port 
-     */
-    void closeConnection(int port);
+    public void setPoolThread(ExecutorService poolThread) {
+        this.poolThread = poolThread;
+    }
     
-    /**
-     * close all connections
-     * 
-     */
-    void shutdown();
 }

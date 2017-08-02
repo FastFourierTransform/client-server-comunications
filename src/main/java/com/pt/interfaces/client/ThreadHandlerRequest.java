@@ -23,37 +23,35 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.exceptions.ClientAlreadyUsePort;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * This thread is used to send message and wait for the response
+ * 
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IClient extends IRequest{
+public abstract class ThreadHandlerRequest implements Runnable{
     
-    /**
-     * Start new thread that will receive messages send by the server,
-     * All message will be handle with the defaultHandler if not override
-     * 
-     * @param host
-     * @param port
-     * @param defaultHandler
-     * @return 
-     * @throws com.pt.exceptions.ClientAlreadyUsePort 
-     */
-    IConnection startConnection(String host,int port,IResponseCallback defaultHandler) throws ClientAlreadyUsePort;
+    protected AtomicInteger messageIDgenerator ;
     
-    /**
-     * End the connection
-     * 
-     * @param port 
-     */
-    void closeConnection(int port);
+    protected IResponseCallback callback;
     
-    /**
-     * close all connections
-     * 
-     */
-    void shutdown();
+    //inputStream that contain the incoming message
+    protected InputStream in;
+    
+    //outputStream for sending the message
+    protected OutputStream out;
+    
+    protected Message message;
+    
+    public ThreadHandlerRequest(IResponseCallback callback,InputStream in, OutputStream out, Message message, AtomicInteger messageIDgenerator){
+        this.callback = callback;
+        this.in = in;
+        this.out = out;
+        this.message = message;
+        this.messageIDgenerator = messageIDgenerator;
+    }
+
 }

@@ -21,52 +21,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation.client;
+package com.pt.implementation.infrastruct;
 
-import com.pt.interfaces.client.ConnectionReceiver;
-import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
-import com.pt.utils.Utils;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
+import com.pt.exceptions.ServerAlreadyUsePort;
+import com.pt.implementation.client.Client;
+import com.pt.implementation.server.Server;
+import com.pt.interfaces.server.IHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Simulate a new process 
+ * 
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
-    
-    private Socket inSocket;
-    
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
+public class ThreadServerConnection extends Thread{
 
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
+    private final IHandler serverHandler;
+    private final Server server;
+    private final int port;
+    
+    public ThreadServerConnection( int port,IHandler sHandler){
+        this.serverHandler = sHandler;
+        this.server = new Server(50,1);
+        this.port = port;
     }
     
     @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
-    }
-
-    @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void run() {
+        
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
-            int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
-        } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
-        } 
-        return -1;
+            server.startListningConnections(port, serverHandler);
+            System.out.println("Server strat");
+        } catch (ServerAlreadyUsePort ex) {
+            Logger.getLogger(ThreadServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void shutdown(){
+        server.shutdown();
+        this.interrupt();
     }
     
 }

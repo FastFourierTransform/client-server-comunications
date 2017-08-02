@@ -55,4 +55,10 @@ public abstract class ThreadConnectionServer extends Thread{
     public int getPort(){
         return port;
     }
+
+    public void setPool(ExecutorService pool) {
+        this.pool = pool;
+    }
+    
+    
 }

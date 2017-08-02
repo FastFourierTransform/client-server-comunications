@@ -23,10 +23,34 @@ SOFTWARE.
  */
 package com.pt.interfaces.server;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  *
  * @author Tiago Alexandre Melo Almeida
  */
 public abstract class ThreadRequestServer extends Thread{
+    
+    protected IHandler messageHandler;
+    protected int port;
+    protected ExecutorService pool;
+    
+    public ThreadRequestServer(int port,IHandler mHandler,ExecutorService pool){
+        super("RequestServer on "+port);
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+    
+    public ThreadRequestServer(int port,IHandler mHandler,ExecutorService pool,String name){
+        super(name);
+        this.messageHandler = mHandler;
+        this.port = port;
+        this.pool = pool;
+    }
+    
+    public int getPort(){
+        return port;
+    }
     
 }

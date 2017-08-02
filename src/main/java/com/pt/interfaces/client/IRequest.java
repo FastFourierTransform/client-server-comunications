@@ -24,54 +24,59 @@ SOFTWARE.
 package com.pt.interfaces.client;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  *
  * @author Tiago Alexandre Melo Almeida
- * 
- * Represent a connection with the server
- * Features:
- *  send message and wait for response sync
- *  send message and wait for response assync, i.e receive in Receiver thread
- *  send message assync and receive assync, i.e send message with help of thread pool, and receive in Receiver Thread 
  */
-public interface IConnection {
-    
+public interface IRequest {
+    /**
+     * Send Message and wait for response
+     * Note: The inputStream that contains the incoming message is returned so the
+     * user should know how the message 
+     * 
+     * @param host
+     * @param port
+     * @param message
+     * @return response
+     * @throws java.lang.Exception
+     */
+    InputStream sendRequest(String host, int port, Message message) throws Exception;
     
     /**
      * Send Message without using another thread
-     * Receiver thread should wait for the response
+     * Using other thread to receive the response
      * 
-     * @param outStream outputStream here the user should write the message to send
+     * @param host
+     * @param port
+     * @param message
      * @param callback
      * @throws java.lang.Exception 
      */
-    void sendRequestWaitAssync(Message message,IResponseCallback callback) throws Exception;
+    void sendRequestWaitAssync(String host, int port,Message message,IResponseCallback callback) throws Exception;
     
     /**
      * Send Message asynchronous
      * Receive Message asynchronous
-     * New thread should send and the receiver thread should wait for the response
+     * New thread should send and receiver the response
      * 
-     * @param outStream outputStream here the user should write the message to send
+     * @param host
+     * @param port
+     * @param message
      * @param callback - implementation of callback function that handler the receive message
      * @throws java.lang.Exception 
      */
-    void sendRequestAssync(Message message,IResponseCallback callback) throws Exception;
+    void sendRequestAssync(String host, int port,Message message,IResponseCallback callback) throws Exception;
 
     /**
      * Send messege and dont wait for response
      * Note dont exist any kinda of feedback
      * 
-     * @param outStream outputStream here the user should write the message to send
+     * @param host
+     * @param port
+     * @param message
      * @throws java.lang.Exception 
      */
-    void sendRequestWithoutResponse(Message message) throws Exception;
-    //TODO sendRequestWithoutResponse Assync
+    void sendRequestWithoutResponse(String host, int port,Message message) throws Exception;
     
-    /**
-     * End this connection
-     */
-    void close();
 }

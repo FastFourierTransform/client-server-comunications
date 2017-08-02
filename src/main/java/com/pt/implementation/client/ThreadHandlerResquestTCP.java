@@ -23,14 +23,15 @@ SOFTWARE.
  */
 package com.pt.implementation.client;
 
-import com.pt.interfaces.client.ConnectionReceiver;
 import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
+import com.pt.interfaces.client.Message;
+import com.pt.interfaces.client.ThreadHandlerRequest;
 import com.pt.utils.Utils;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
+import java.io.OutputStream;
+import java.net.ProtocolException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,35 +39,33 @@ import java.util.logging.Logger;
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
-    
-    private Socket inSocket;
-    
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
+public class ThreadHandlerResquestTCP extends ThreadHandlerRequest{
 
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
+    public ThreadHandlerResquestTCP(IResponseCallback callback, InputStream in, OutputStream out, Message message, AtomicInteger messageIDgenerator) {
+        super(callback, in, out, message, messageIDgenerator);
     }
     
     @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
-    }
-
-    @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void run() {
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
-            int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
-        } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
-        } 
-        return -1;
+            
+            int messageID = messageIDgenerator.getAndIncrement();
+            
+            out.write(Utils.intToBytes(messageID));
+            message.send(out);
+            out.flush();//send
+            
+            //receiving
+            int incommingMsgID = new DataInputStream(in).readInt();
+            
+            if (messageID!=incommingMsgID)
+                throw new ProtocolException("Message ID's dont match");
+            
+            callback.handlerResponse(in);
+        } catch (Exception ex) {
+            Logger.getLogger(ThreadHandlerResquestTCP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
 }

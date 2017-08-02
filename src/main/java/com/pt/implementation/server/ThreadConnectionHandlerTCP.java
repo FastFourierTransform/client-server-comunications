@@ -28,6 +28,8 @@ import com.pt.interfaces.server.IHandler;
 import com.pt.utils.Utils;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +43,8 @@ public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
     
     //represente a channel of communication with the client
     private final Socket cSocket;
+    private OutputStream cOut;
+    private InputStream cIn;
     
     public ThreadConnectionHandlerTCP(IHandler mHandler,Socket cSocket)
     {
@@ -52,26 +56,27 @@ public class ThreadConnectionHandlerTCP extends ThreadConnectionHandler{
     public void run() {
         
         try {
+            cOut = cSocket.getOutputStream();
+            cIn = cSocket.getInputStream();
             while (!cSocket.isClosed()){
-                DataInputStream input = new DataInputStream(cSocket.getInputStream());
-                
+                DataInputStream input = new DataInputStream(cIn);
+
                 int messageId = input.readInt();
-                int messageSize = input.readInt();
+                System.out.println("Server read int " + messageId);
+                //keep message protocol 
+                cOut.write(Utils.intToBytes(messageId));
                 
-                byte[] response = messageHandler.handleMessage(Utils.readUntilMaxSize(input,messageSize));
+                messageHandler.handleMessage(cIn, cOut);
                 
-                //Thread.sleep(5000);//for test
+                cOut.flush();
+                System.out.println("Server send response");
                 
-                if (response!=null && response.length>0){
-                    //System.out.println("Server - create response");
-                    byte[] idAndSize = Utils.concatenateByteArrays(Utils.intToBytes(messageId),Utils.intToBytes(response.length));
-                    cSocket.getOutputStream().write(Utils.concatenateByteArrays(idAndSize, response));
-                    cSocket.getOutputStream().flush();
-                    //System.out.println("Server - Send response");
-                }
+                
             }
         } catch (IOException ex) {
-            Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.SEVERE, "Error receiving or sending from socket", ex);
+            Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.WARNING, "Error receiving or sending from socket\nProbably client end connection", ex);
+        } catch (Exception ex) {
+            Logger.getLogger(ThreadConnectionHandlerTCP.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
 }

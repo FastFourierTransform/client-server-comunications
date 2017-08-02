@@ -23,14 +23,12 @@ SOFTWARE.
  */
 package com.pt.implementation.client;
 
-import com.pt.interfaces.client.ConnectionReceiver;
 import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
-import com.pt.utils.Utils;
+import com.pt.interfaces.client.ThreadResponseCallback;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
+import java.net.ProtocolException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,35 +36,25 @@ import java.util.logging.Logger;
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
-    
-    private Socket inSocket;
-    
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
+public class ThreadResponseCallbackTCP extends ThreadResponseCallback{
 
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
-    }
-    
-    @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
+    public ThreadResponseCallbackTCP(IResponseCallback callback,InputStream in, int msgID) {
+        super(callback,in,msgID);
     }
 
     @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void run() {
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
-            int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
-        } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
+            int incommingMsgID = new DataInputStream(in).readInt();
+            
+            if (messageID!=incommingMsgID)
+                throw new ProtocolException("Message ID's dont match");
+            
+            callback.handlerResponse(in);
+            
+        } catch (Exception ex) {
+            Logger.getLogger(ThreadResponseCallbackTCP.class.getName()).log(Level.SEVERE, null, ex);
         } 
-        return -1;
     }
     
 }

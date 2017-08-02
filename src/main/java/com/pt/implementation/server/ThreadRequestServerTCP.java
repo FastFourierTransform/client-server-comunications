@@ -21,16 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation.client;
+package com.pt.implementation.server;
 
-import com.pt.interfaces.client.ConnectionReceiver;
-import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
-import com.pt.utils.Utils;
-import java.io.DataInputStream;
+import com.pt.interfaces.server.IHandler;
+import com.pt.interfaces.server.ThreadRequestServer;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,35 +36,36 @@ import java.util.logging.Logger;
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
+public class ThreadRequestServerTCP extends ThreadRequestServer{
     
-    private Socket inSocket;
+    public static final String TCP_SERVER = "TCP__REQUEST__SERVER";
     
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
-
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
-    }
+    private ServerSocket serverSocket;
     
-    @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
+    public ThreadRequestServerTCP(int port,IHandler messageHandler,ExecutorService pool) {
+        super(port,messageHandler,pool,"RequestServerTCP on port "+port);
     }
 
     @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void run() {
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
-            int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
+            serverSocket = new ServerSocket(port);
         } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
-        } 
-        return -1;
+            Logger.getLogger(TCP_SERVER).log(Level.SEVERE, "Port already in use by other program, can´t launch this thread", ex);
+            return;
+        }
+        
+        while (true)
+        {
+            try {
+                Socket tempConnection = serverSocket.accept();
+
+                pool.execute(new ThreadRequestHandlerTCP(messageHandler,tempConnection));
+                
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadConnectionServerTCP.class.getName()).log(Level.SEVERE, "Unable to accept connection error ", ex);
+            }
+        }
     }
     
 }

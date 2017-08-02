@@ -23,37 +23,26 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.exceptions.ClientAlreadyUsePort;
 import java.io.InputStream;
 
 /**
- *
+ * This thread only used to handle the incoming (receive) message
+ * 
  * @author Tiago Alexandre Melo Almeida
  */
-public interface IClient extends IRequest{
+public abstract class ThreadResponseCallback implements Runnable{
     
-    /**
-     * Start new thread that will receive messages send by the server,
-     * All message will be handle with the defaultHandler if not override
-     * 
-     * @param host
-     * @param port
-     * @param defaultHandler
-     * @return 
-     * @throws com.pt.exceptions.ClientAlreadyUsePort 
-     */
-    IConnection startConnection(String host,int port,IResponseCallback defaultHandler) throws ClientAlreadyUsePort;
+    protected IResponseCallback callback;
     
-    /**
-     * End the connection
-     * 
-     * @param port 
-     */
-    void closeConnection(int port);
+    //inputStream that contain the incoming message
+    protected InputStream in;
     
-    /**
-     * close all connections
-     * 
-     */
-    void shutdown();
+    //send message ID to comparete with the receiving messageID
+    protected int messageID;
+    
+    public ThreadResponseCallback(IResponseCallback callback,InputStream in, int msgID){
+        this.callback = callback;
+        this.in = in;
+        this.messageID = msgID;
+    }
 }

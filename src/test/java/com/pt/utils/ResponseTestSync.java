@@ -21,16 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-package com.pt.implementation.client;
+package com.pt.utils;
 
-import com.pt.interfaces.client.ConnectionReceiver;
+import com.pt.implementation.client.HandlerSyncResponse;
 import com.pt.interfaces.client.IResponseCallback;
-import com.pt.utils.Pointer;
-import com.pt.utils.Utils;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
+import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,35 +36,29 @@ import java.util.logging.Logger;
  *
  * @author Tiago Alexandre Melo Almeida
  */
-public class ConnectionReceiverTCP extends ConnectionReceiver {
-    
-    private Socket inSocket;
-    
-    public ConnectionReceiverTCP(IResponseCallback handler) {
-        super(handler);
-    }
+public class ResponseTestSync implements IResponseCallback{
 
-    public void setSocket(Socket socket){
-        this.inSocket = socket;
-    }
+    public String message;
+    private final Semaphore sem;
+    private final int size;
     
-    @Override
-    public boolean condition() {
-        return !this.isInterrupted() && !inSocket.isClosed();
+    public ResponseTestSync(Semaphore sem,int sizeExpectedResponse){
+        this.sem = sem;
+        this.size = sizeExpectedResponse;
     }
 
     @Override
-    public int waitResponse(Pointer<InputStream> responseServer) {
+    public void handlerResponse(InputStream inStream) {
         try {
-            responseServer.value = inSocket.getInputStream();
-            DataInputStream input = new DataInputStream(responseServer.value);
-            int messageId = input.readInt();
-            System.out.println("Client read int " + messageId);
-            return messageId;
+            //message receive
+            byte[] array = Utils.readUntilMaxSize(new DataInputStream(inStream), size);
+                    
+            this.message = new String(array);
+            System.out.println("Receive from server " + this.message);
+            sem.release();
         } catch (IOException ex) {
-            Logger.getLogger(ConnectionReceiverTCP.class.getName()).log(Level.WARNING, "Socket close", ex);
-        } 
-        return -1;
+            Logger.getLogger(HandlerSyncResponse.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }

@@ -23,7 +23,7 @@ SOFTWARE.
  */
 package com.pt.interfaces.client;
 
-import com.pt.utils.Pointer;
+import java.io.InputStream;
 
 /**
  *
@@ -31,5 +31,11 @@ import com.pt.utils.Pointer;
  */
 public interface IResponseCallback {
 
-    void handlerResponse(byte[] message);
+    /**
+     * InputStream of the receiving message
+     * 
+     * @param inStream 
+     * @throws java.lang.Exception 
+     */
+    void handlerResponse(InputStream inStream) throws Exception;
 }

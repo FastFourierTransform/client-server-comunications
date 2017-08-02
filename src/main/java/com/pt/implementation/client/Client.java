@@ -26,6 +26,7 @@ package com.pt.implementation.client;
 import com.pt.exceptions.ClientAlreadyUsePort;
 import com.pt.exceptions.ServerAlreadyUsePort;
 import com.pt.implementation.server.ThreadConnectionServerTCP;
+import com.pt.implementation.server.ThreadNamedFactory;
 import com.pt.interfaces.client.Connection;
 import com.pt.interfaces.client.IClient;
 import com.pt.interfaces.client.IConnection;
@@ -34,6 +35,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import com.pt.interfaces.client.IResponseCallback;
+import com.pt.interfaces.client.Message;
+import com.pt.interfaces.client.Request;
+import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -44,31 +48,28 @@ public class Client implements IClient{
 
     private final Map<Integer,Connection> openConnections;
     private final ExecutorService requestThreadPool;
+    private final Request request;
+    
+    public Client(Request request){
+        this.request = request;
+        openConnections = new HashMap<>();
+        requestThreadPool = Executors.newCachedThreadPool(new ThreadNamedFactory("ThreadClientAssyncSender - %d"));
+        this.request.setPoolThread(requestThreadPool);
+    }
     
     public Client(){
         openConnections = new HashMap<>();
-        requestThreadPool = Executors.newCachedThreadPool();
+        requestThreadPool = Executors.newCachedThreadPool(new ThreadNamedFactory("ThreadClientAssyncSender - %d"));
+        this.request = new RequestTCP();//TODO should be UDP
+        this.request.setPoolThread(requestThreadPool);
     }
     
-    @Override
-    public byte[] sendRequest(String host, int port, byte[] message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public byte[] sendRequestAssync(String host, int port, byte[] message, IResponseCallback callback) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void sendRequestWithoutResponse(String host, int port, byte[] message) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
 
     @Override
     public IConnection startConnection(String host, int port, IResponseCallback defaultHandler) throws ClientAlreadyUsePort{
         if (!openConnections.containsKey(port)){
-            openConnections.put(port, new ConnectionTCP(host, port, defaultHandler));
+            openConnections.put(port, new ConnectionTCP(host, port, defaultHandler,requestThreadPool));
             openConnections.get(port).connect();
             return openConnections.get(port);
         }
@@ -97,6 +98,26 @@ public class Client implements IClient{
     @Override
     public void shutdown() {
         openConnections.forEach((k,v)->v.close());
+    }
+
+    @Override
+    public InputStream sendRequest(String host, int port, Message message) throws Exception {
+        return request.sendRequest(host, port, message);
+    }
+
+    @Override
+    public void sendRequestWaitAssync(String host, int port, Message message, IResponseCallback callback) throws Exception {
+        request.sendRequestWaitAssync(host, port, message, callback);
+    }
+
+    @Override
+    public void sendRequestAssync(String host, int port, Message message, IResponseCallback callback) throws Exception {
+        request.sendRequestAssync(host, port, message, callback);
+    }
+
+    @Override
+    public void sendRequestWithoutResponse(String host, int port, Message message) throws Exception {
+        request.sendRequestWithoutResponse(host, port, message);
     }
     
 }

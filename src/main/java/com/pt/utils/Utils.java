@@ -26,9 +26,11 @@ package com.pt.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- *
+ * TODO using java reflection to aggregate intToByte and longToByte and otherwise
+ * 
  * @author Tiago Alexandre Melo Almeida
  */
 public class Utils {
@@ -50,6 +52,24 @@ public class Utils {
         }
         return result;
     }
+    
+    public static byte[] longToBytes(long integer) {
+        byte[] result = new byte[Long.BYTES];
+        for (int i = Long.BYTES - 1; i >= 0; i--) {
+            result[i] = (byte) (integer & 0xFF);
+            integer >>= Byte.SIZE;
+        }
+        return result;
+    }
+
+    public static int bytesToLong(byte[] b) {
+        int result = 0;
+        for (int i = 0; i < Long.BYTES; i++) {
+            result <<= Byte.SIZE;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
 
     //more effecient?
     public static byte[] concatenateByteArrays(byte[] a, byte[] b) {
@@ -57,6 +77,25 @@ public class Utils {
         System.arraycopy(a, 0, result, 0, a.length);
         System.arraycopy(b, 0, result, a.length, b.length);
         return result;
+    }
+    
+    public static byte[] concatenateByteArrays(byte[] a, byte type) {
+        byte[] b = new byte[1];
+        b[0]=type;
+        byte[] result = new byte[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
+    }
+    
+    public static byte[] concatenateIdTypeAndSize(int id, byte type,int size) {
+        byte[] result = concatenateByteArrays(intToBytes(id), type);
+        return concatenateByteArrays(result, intToBytes(size));
+    }
+    
+    public static byte[] concatenateIdTypeAndSize(int id, byte type,long size) {
+        byte[] result = concatenateByteArrays(intToBytes(id), type);
+        return concatenateByteArrays(result, longToBytes(size));
     }
 
     public static byte[] readUntilMaxSize(DataInputStream input,int bytesToRead) throws IOException {
@@ -73,5 +112,15 @@ public class Utils {
         
         output.flush();
         return output.toByteArray();
+    }
+    
+    public static byte[] InputStreamToByteArray(InputStream inStream) throws IOException{
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inStream.read(buffer)) != -1) {
+            result.write(buffer, 0, length);
+        }
+        return result.toByteArray();
     }
 }

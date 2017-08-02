@@ -23,6 +23,8 @@ SOFTWARE.
  */
 package com.pt.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.junit.After;
 import org.junit.Assert;
@@ -80,6 +82,16 @@ public class UtilsTest {
 
     @Test
     public void testReadUntilMaxSize() throws Exception {
+    }
+    
+    @Test
+    public void testInputStreamToByteArray() throws IOException{
+        byte[] expected = "Tiago".getBytes();
+        ByteArrayInputStream bis = new ByteArrayInputStream(expected);
+        
+        byte[] result = Utils.InputStreamToByteArray(bis);
+        
+        Assert.assertArrayEquals(expected, result);
     }
     
 }
